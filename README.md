@@ -43,13 +43,26 @@ npm run build
 
 ### Create Azure resources
 
+### Modify backend code
+
+Go to backend/app.py, change all variables values if needed.
+
+## To add docuement to search index
+
+Go to backend/scripts folder, then execute the command as below.
+
+`python predocs_cn.py <filename> --storageaccount xxx --container xxx --folder xxx --searchservice xxx --index xxx --formrecognizerservice xxx --formrecognizerkey xxx --searchkey xxx --storagekey xxx -v `
+
 ## To run locally
+
+Copy setenv.example.cmd to setenv.cmd and add all necessary information in it.
 
 ```bash
 cd frontend
 npm install
-npm run build
+npm run dev
 cd ..
+setenv.cmd
 cd backend
 python app.py
 ```
