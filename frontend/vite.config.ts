@@ -9,6 +9,7 @@ export default defineConfig({
         emptyOutDir: true,
         sourcemap: true,
         rollupOptions: {
+            external: ['scheduler'],
             output:{
                 manualChunks(id) {
                   if (id.includes('node_modules')) {

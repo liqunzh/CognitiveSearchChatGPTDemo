@@ -211,8 +211,8 @@ def get_document_text(filename):
 def get_table_description_text(table_text):
     prompt = """以自然语言描述下面这个表格，要求保持数据准确，保留所有表格中的数据和信息 {text} """
     openai.api_type = "azure"
-    openai.api_key = 
-    openai.api_base = 
+    openai.api_key = "dd356763b9bd4c6db4af70e5de017a9c"
+    openai.api_base = "bk-openai-demo"
     openai.api_version = "2023-03-15-preview"
 
     message = [
@@ -301,13 +301,13 @@ def create_sections(filename, page_map):
         print(f"{encoded_id_str}: {os.path.basename(filename)}")
         yield {
             # "id": re.sub("[^0-9a-zA-Z_-]","_",f"{filename}-{i}"),
-            "id": encoded_id_str,
-            "content": section,
-            "category": args.category,
-            "sourcepage": os.path.basename(filename),
-            "sourcefile": os.path.basename(filename),
-            "metadata_storage_name": os.path.basename(filename),
-            "metadata_storage_path": f"https://{args.storageaccount}.blob.core.windows.net/{args.container}/{args.folder}/{os.path.basename(filename)}"
+            "Id": encoded_id_str,
+            "Content": section,
+            "Category": args.category,
+            "SourcePage": str(pagenum),
+            "SourceFile": os.path.basename(filename)
+            # "metadata_storage_name": os.path.basename(filename),
+            # "metadata_storage_path": f"https://{args.storageaccount}.blob.core.windows.net/{args.container}/{args.folder}/{os.path.basename(filename)}"
             # "metadata_storage_path": f"https://{args.storageaccount}.blob.core.chinacloudapi.cn/{args.container}/{args.folder}/{os.path.basename(filename)}"
         }
 
@@ -324,17 +324,17 @@ def create_search_index():
         index = SearchIndex(
             name=args.index,
             fields=[
-                SimpleField(name="id", type="Edm.String", key=True),
-                SearchableField(name="content", type="Edm.String", analyzer_name="en.microsoft"),
-                SimpleField(name="category", type="Edm.String", filterable=True, facetable=True),
-                SimpleField(name="sourcepage", type="Edm.String", filterable=True, facetable=True),
-                SimpleField(name="sourcefile", type="Edm.String", filterable=True, facetable=True)
+                SimpleField(name="Id", type="Edm.String", key=True),
+                SearchableField(name="Content", type="Edm.String", analyzer_name="en.microsoft"),
+                SimpleField(name="Category", type="Edm.String", filterable=True, facetable=True),
+                SimpleField(name="SourcePage", type="Edm.String", filterable=True, facetable=True),
+                SimpleField(name="SourceFile", type="Edm.String", filterable=True, facetable=True)
             ],
             semantic_settings=SemanticSettings(
                 configurations=[SemanticConfiguration(
                     name='default',
                     prioritized_fields=PrioritizedFields(
-                        title_field=None, prioritized_content_fields=[SemanticField(field_name='content')]))])
+                        title_field=None, prioritized_content_fields=[SemanticField(field_name='Content')]))])
         )
         if args.verbose: print(f"Creating {args.index} search index")
         index_client.create_index(index)
@@ -353,8 +353,8 @@ def index_sections(filename, sections):
     batch = []
     for s in sections:
         # Save section to txt file
-        with open("txt/"+s["sourcefile"]+".txt", "w", encoding="utf-8") as f:
-            f.write(s["content"])
+        with open("txt/"+s["SourceFile"]+".txt", "w", encoding="utf-8") as f:
+            f.write(s["Content"])
 
         batch.append(s)
         i += 1
@@ -378,11 +378,11 @@ def remove_from_index(filename):
     #                                 index_name=args.index,
     #                                 credential=search_creds)
     while True:
-        filter = None if filename == None else f"sourcefile eq '{os.path.basename(filename)}'"
+        filter = None if filename == None else f"SourceFile eq '{os.path.basename(filename)}'"
         r = search_client.search("", filter=filter, top=1000, include_total_count=True)
         if r.get_count() == 0:
             break
-        r = search_client.delete_documents(documents=[{ "id": d["id"] } for d in r])
+        r = search_client.delete_documents(documents=[{ "Id": d["id"] } for d in r])
         if args.verbose: print(f"\tRemoved {len(r)} sections from index")
         # It can take a few seconds for search results to reflect changes, so wait a bit
         time.sleep(2)

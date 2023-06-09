@@ -105,7 +105,7 @@ class ChatReadRetrieveReadApproach(Approach):
         self.bing_search_subscriptin_key = subscription_key
         self.bing_search_endpoint = bing_search_endpoint
         self.sourcepage_path_field = sourcepage_path_field
-        self.kg_search = GPTKGIndexer()
+        # self.kg_search = GPTKGIndexer()
 
     def run(self, history: list[dict], overrides: dict) -> any:
         top = overrides.get("top") or 3
@@ -113,7 +113,7 @@ class ChatReadRetrieveReadApproach(Approach):
         useBingSearch = overrides.get("use_bing_search") or False
         # STEP 0: Use OpenAI to determine index
         search_processor = {
-            "graph": self.knowledge_graph_search,
+            # "graph": self.knowledge_graph_search,
             "text" : self.text_search,
             "all"  : self.combine_search
         }
@@ -187,14 +187,15 @@ class ChatReadRetrieveReadApproach(Approach):
             search_method = 'text'
         return search_method
     
-    def knowledge_graph_search(self, question, history: list[dict], overrides: dict):
-        result = self.kg_search.query(question)
-        json_result = {"sourcepage": result.get_formatted_sources(), "content": result.response, "sourcepage_path":""}
-        print(json_result)
-        return json.dumps(json_result, ensure_ascii=False)
+    # def knowledge_graph_search(self, question, history: list[dict], overrides: dict):
+    #     result = self..query(question)
+    #     json_result = {"sourcepage": result.get_formatted_sources(), "content": result.response, "sourcepage_path":""}
+    #     print(json_result)
+    #     return json.dumps(json_result, ensure_ascii=False)
 
     def text_search(self, question,history: list[dict], overrides: dict):
-        use_semantic_captions = True if overrides.get("semantic_captions") else False
+        # use_semantic_captions = True if overrides.get("semantic_captions") else False
+        use_semantic_captions = False
         top = overrides.get("top") or 3
         exclude_category = overrides.get("exclude_category") or None
         filter = "category ne '{}'".format(exclude_category.replace("'", "''")) if exclude_category else None
@@ -223,18 +224,24 @@ class ChatReadRetrieveReadApproach(Approach):
         else:
             r = self.search_client.search(q, filter=filter, top=top)
 
+        for doc in r:
+            print(doc)
+
         if use_semantic_captions:
             json_results = [{"sourcepage": doc[self.sourcepage_field], "content": nonewlines(" . ".join([c.text for c in doc['@search.captions']])), "sourcepage_path": doc[self.sourcepage_path_field]} for doc in r]     
         else:
             json_results = [{"sourcepage": doc[self.sourcepage_field], "content": nonewlines(doc[self.content_field]), "sourcepage_path": doc[self.sourcepage_path_field]} for doc in r if doc['@search.score']]
 
         json_results = json.dumps(json_results, ensure_ascii=False)
+
+        print("Search result: "+json_results);
         return json_results
 
     def combine_search(self, question, history: list[dict], overrides: dict):
-        kg_response = self.knowledge_graph_search(question, history, overrides)
+        # kg_response = self.knowledge_graph_search(question, history, overrides)
         text_response = self.text_search(question, history, overrides)
-        return kg_response+text_response
+        # return kg_response+text_response
+        return text_response
 
     def get_chat_history_as_text(self, history, include_last_turn=True, approx_max_tokens=1000):
         history_text = ""
@@ -259,6 +266,6 @@ class ChatReadRetrieveReadApproach(Approach):
         headers = { 'Ocp-Apim-Subscription-Key': self.bing_search_subscriptin_key }
         r = requests.get(self.bing_search_endpoint, headers=headers, params=params)
         json_response = json.loads(r.text)
-        # print(json_response)
+        print(json_response)
         result = [page['name'] + ": " + nonewlines(page['snippet']) + " <" + page['url'] + ">" for page in list(json_response['webPages']['value'])[:top]]
         return result

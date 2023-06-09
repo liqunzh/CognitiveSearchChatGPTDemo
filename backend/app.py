@@ -22,20 +22,20 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Replace these with your own values, either in environment variables or directly here
-AZURE_BLOB_STORAGE_ACCOUNT = os.environ.get("AZURE_BLOB_STORAGE_ACCOUNT") or "openaidemostorageaccount"
+AZURE_BLOB_STORAGE_ACCOUNT = os.environ.get("AZURE_BLOB_STORAGE_ACCOUNT") or "bkstr"
 AZURE_BLOB_STORAGE_CONTAINER = os.environ.get("AZURE_BLOB_STORAGE_CONTAINER") or "content"
 AZURE_BLOB_STORAGE_FOLDER = os.environ.get("AZURE_BLOB_STORAGE_FOLDER") or "documents"
 
-AZURE_SEARCH_SERVICE = os.environ.get("AZURE_SEARCH_SERVICE") or "cognitivesearchgpt"
-AZURE_SEARCH_INDEX = os.environ.get("AZURE_SEARCH_INDEX") or "gpt-index"
-AZURE_OPENAI_SERVICE = os.environ.get("AZURE_OPENAI_SERVICE") or "az-openai-v2"
+AZURE_SEARCH_SERVICE = os.environ.get("AZURE_SEARCH_SERVICE") or "bk-search"
+AZURE_SEARCH_INDEX = os.environ.get("AZURE_SEARCH_INDEX") or "gptindex"
+AZURE_OPENAI_SERVICE = os.environ.get("AZURE_OPENAI_SERVICE") or "bk-openai-demo"
 AZURE_OPENAI_GPT_DEPLOYMENT = os.environ.get("AZURE_OPENAI_GPT_DEPLOYMENT") or "text-davinci-003"
 AZURE_OPENAI_CHATGPT_DEPLOYMENT = os.environ.get("AZURE_OPENAI_CHATGPT_DEPLOYMENT") or "gpt-35-turbo"
 
-KB_FIELDS_CONTENT = os.environ.get("KB_FIELDS_CONTENT") or "content"
-KB_FIELDS_CATEGORY = os.environ.get("KB_FIELDS_CATEGORY") or "category"
-KB_FIELDS_SOURCEPAGE = os.environ.get("KB_FIELDS_SOURCEPAGE") or "metadata_storage_name"
-KB_FIELDS_SOURCE_PATH = os.environ.get("KB_FIELDS_SOURCE_PATH") or "metadata_storage_path"
+KB_FIELDS_CONTENT = os.environ.get("KB_FIELDS_CONTENT") or "Content"
+KB_FIELDS_CATEGORY = os.environ.get("KB_FIELDS_CATEGORY") or "Category"
+KB_FIELDS_SOURCEPAGE = os.environ.get("KB_FIELDS_SOURCEPAGE") or "SourcePage"
+KB_FIELDS_SOURCE_PATH = os.environ.get("KB_FIELDS_SOURCE_PATH") or "SourceFile"
 
 AZURE_CLIENT_ID = os.environ.get("AZURE_CLIENT_ID") 
 AZURE_CLIENT_SECRET = os.environ.get("AZURE_CLIENT_SECRET")
@@ -53,8 +53,8 @@ AZURE_SPEECH_SERVICE_HOST = os.environ.get("AZURE_SPEECH_SERVICE_HOST")
 AZURE_OPENAI_API_KEY_SOUTH_CENTRAL_US = os.environ.get("AZURE_OPENAI_API_KEY_SOUTH_CENTRAL_US")
 AZURE_OPENAI_BASE = os.environ.get("AZURE_OPENAI_BASE") or f"https://{AZURE_OPENAI_SERVICE}.openai.azure.com"
 
-AZURE_COGNITIVE_SEARCH_ENDPOINT = os.environ.get("AZURE_COGNITIVE_SEARCH_ENDPOINT") or f"https://{AZURE_SEARCH_SERVICE}.search.azure.cn"
-#AZURE_COGNITIVE_SEARCH_ENDPOINT = f"https://{AZURE_SEARCH_SERVICE}.search.windows.net
+#AZURE_COGNITIVE_SEARCH_ENDPOINT = os.environ.get("AZURE_COGNITIVE_SEARCH_ENDPOINT") or f"https://{AZURE_SEARCH_SERVICE}.search.azure.cn"
+AZURE_COGNITIVE_SEARCH_ENDPOINT = f"https://{AZURE_SEARCH_SERVICE}.search.windows.net"
 AZURE_BLOB_STORAGE_ACCOUNT_ENDPOINT = os.environ.get("AZURE_BLOB_STORAGE_ACCOUNT_ENDPOINT") or f"https://{AZURE_BLOB_STORAGE_ACCOUNT}.blob.core.chinacloudapi.cn"
 
 IS_DEPLOYED_TO_CHINA_21v = os.environ.get("IS_DEPLOYED_TO_CHINA_21v") or False
@@ -128,6 +128,7 @@ ask_approaches = {
 }
 
 chat_approaches = {
+    # "rrr": ChatReadRetrieveReadApproach(search_client, AZURE_OPENAI_CHATGPT_DEPLOYMENT, AZURE_OPENAI_GPT_DEPLOYMENT, KB_FIELDS_SOURCEPAGE, KB_FIELDS_CONTENT, KB_FIELDS_SOURCE_PATH,AZURE_BING_SEARCH_SUBSCRIPTION_KEY,AZURE_BING_SEARCH_ENDPOINT)
     "rrr": ChatReadRetrieveReadApproach(search_client, AZURE_OPENAI_CHATGPT_DEPLOYMENT, AZURE_OPENAI_GPT_DEPLOYMENT, KB_FIELDS_SOURCEPAGE, KB_FIELDS_CONTENT, KB_FIELDS_SOURCE_PATH,AZURE_BING_SEARCH_SUBSCRIPTION_KEY,AZURE_BING_SEARCH_ENDPOINT)
 }
 
